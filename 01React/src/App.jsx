@@ -6,10 +6,12 @@ import NewFunction from './New.jsx'
 function App() {
   // const [count, setCount] = useState(0)
 
+  const userName = "Soumabrata"
+
   return (
     <>
     <NewFunction />
-    <h1>Hello World!</h1>
+    <h1>Hello World! {userName}</h1>
     </>
 
   )
