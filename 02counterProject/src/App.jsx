@@ -14,8 +14,10 @@ function App() {
       return;
      }
 
-     setCount(counterValue + 1);
-    }
+     setCount(prevCounter => prevCounter + 1);   // This is the correct way to update the value of state variable.
+     setCount(prevCounter => prevCounter + 1);
+     setCount(prevCounter => prevCounter + 1);
+}
 
 
     // Preventing negative values
