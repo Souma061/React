@@ -1,0 +1,15 @@
+#root {
+  width: 100%;
+  margin: 0;
+}
+
+.glass-surface {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.14), rgba(71, 85, 105, 0.22));
+  backdrop-filter: blur(18px);
+}
+
+.focus-outline {
+  outline: 2px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 3px;
+  transition: outline-offset 200ms ease, outline-color 200ms ease;
+}
