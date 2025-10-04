@@ -6,12 +6,13 @@ export class AuthService {
   account;
 
   constructor() {
-    this.client.setEndpoint(conf.appwriteUrl) // Your API Endpoint
+    this.client
+      .setEndpoint(conf.appwriteUrl) // Your API Endpoint
       .setProject(conf.appwriteProjectId); // Your project ID
     this.account = new Account(this.client);
   }
 
-  async createAccount({ email, password, name}) {
+  async createAccount({ email, password, name }) {
     try {
       const userAccount = await this.account.create(ID.unique(), email, password, name);
       if (userAccount) {
@@ -35,9 +36,14 @@ export class AuthService {
 
   async getCurrentUser() {
     try {
-       return await this.account.get();
+      return await this.account.get();
     } catch (error) {
-      console.log("Appwrite service :: getCurrentUser :: error", error);
+      // Handle 401 Unauthorized gracefully for guest users
+      if (error.code === 401 || error.type === 'general_unauthorized_scope') {
+        console.log('User not authenticated - guest access');
+        return null;
+      }
+      console.log('Appwrite service :: getCurrentUser :: error', error);
     }
     return null;
   }
