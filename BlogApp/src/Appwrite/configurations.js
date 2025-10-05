@@ -83,3 +83,7 @@ export class Service {
     return this.bucket.getFilePreview(conf.appwriteBucketId,fileId)
   }
 }
+
+const appwriteService = new Service();
+
+export default appwriteService;

@@ -28,7 +28,7 @@ export class AuthService {
 
   async login({ email, password }) {
     try {
-      return await this.account.createEmailPasswordSession(email, password);
+      return await this.account.createEmailSession(email, password);
     } catch (error) {
       throw error;
     }
@@ -43,15 +43,17 @@ export class AuthService {
         console.log('User not authenticated - guest access');
         return null;
       }
+      // Log other errors but don't throw to prevent app crashes
       console.log('Appwrite service :: getCurrentUser :: error', error);
+      return null;
     }
-    return null;
   }
 
   async logOut() {
     try {
       await this.account.deleteSessions();
     } catch (error) {
+      console.log('Appwrite service :: logOut :: error', error);
       throw error;
     }
   }
