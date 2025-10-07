@@ -1,130 +1,122 @@
 import { useCallback, useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+import { useForm, Controller } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import appwriteService from '../../Appwrite/configurations.js';
-import { Button, Input, RTE, Select } from '../index.js';
+import appwriteService from '../../Appwrite/configurations';
+import { Button, Input, RTE, Select } from '../index';
+import { addPost, updatePost, setError } from '../../store/PostSlice';
 
-function PostForm({ post }) {
+export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
     defaultValues: {
       title: post?.title || '',
-      slug: post?.slug || '',
+      slug: post?.$id || '',
       content: post?.content || '',
-      status: post?.status || 'draft',
+      status: post?.status || 'active',
     },
   });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.user);
-  const submit = async (data) => {
-    console.log('=== FORM SUBMISSION STARTED ===');
-    console.log('Form data:', data);
-    console.log('Featured Image:', data.featuredImage);
-    console.log('User data:', userData);
 
-    try {
-      if (post) {
-        console.log('UPDATE MODE');
+  // const watchedTitle = watch('title', '');
 
-        // Check if new file is uploaded
-        let newFileId = null;
-        if (data.featuredImage && data.featuredImage.length > 0) {
-          console.log('Uploading new file for update...');
-          const uploadedFile = await appwriteService.uploadFile(data.featuredImage[0]);
-          if (uploadedFile) {
-            newFileId = uploadedFile.$id;
-            // Delete old file
-            await appwriteService.deleteFile(post.featuredImage);
-          }
-        }
-
-        // Update post
-        const updateData = {
-          title: data.title,
-          slug: data.slug,
-          content: data.content,
-          featuredImage: newFileId || post.featuredImage, // Keep old image if no new one
-          status: data.status,
-          userId: userData.$id,
-        };
-
-        console.log('Updating post with:', updateData);
-        const updatedPost = await appwriteService.updatePost(post.$id, updateData);
-        console.log('Update result:', updatedPost);
-
-        if (updatedPost) {
-          navigate(`/post/${updatedPost.$id}`);
-        } else {
-          alert('Post update failed');
-        }
-      } else {
-        console.log('CREATE MODE');
-
-        // Validate file
-        if (!data.featuredImage || data.featuredImage.length === 0) {
-          console.log('ERROR: No file selected');
-          alert('Please select a featured image');
-          return;
-        }
-
-        const fileToUpload = data.featuredImage[0];
-        console.log('File to upload:', fileToUpload);
-
-        // Upload file
-        console.log('Uploading file...');
-        const uploadedFile = await appwriteService.uploadFile(fileToUpload);
-        console.log('Upload result:', uploadedFile);
-
-        if (!uploadedFile) {
-          alert('File upload failed');
-          return;
-        }
-
-        // Create post
-        const postData = {
-          title: data.title,
-          slug: data.slug,
-          content: data.content,
-          featuredImage: uploadedFile.$id,
-          status: data.status,
-          userId: userData.$id, // Changed from userID to userId
-        };
-
-        console.log('Creating post with:', postData);
-        const newPost = await appwriteService.createPost(postData);
-        console.log('Post creation result:', newPost);
-
-        if (newPost) {
-          navigate(`/post/${newPost.$id}`);
-        } else {
-          alert('Post creation failed');
-        }
-      }
-    } catch (error) {
-      console.error('Submit error:', error);
-      alert('Error: ' + error.message);
-    }
-  };
   const slugTransform = useCallback((value) => {
-    if (value && typeof value === 'string') {
+    if (value && typeof value === 'string')
       return value
         .trim()
         .toLowerCase()
         .replace(/[^a-zA-Z\d\s]+/g, '-')
         .replace(/\s/g, '-');
-    }
+
     return '';
   }, []);
+
   useEffect(() => {
     const subscription = watch((value, { name }) => {
-      if (name === 'title' && !post) {
-        setValue('slug', slugTransform(value.title, { shouldValidate: true }));
+      if (name === 'title') {
+        setValue('slug', slugTransform(value.title), { shouldValidate: true });
       }
     });
 
-    return () => subscription.unsubscribe(); // for memory management and also for cleanup.it is important for interview aspect.
+    return () => subscription.unsubscribe();
   }, [watch, slugTransform, setValue]);
+
+  const submit = async (data) => {
+    try {
+      console.log('=== FORM SUBMISSION STARTED ===');
+      console.log('Form data:', data);
+      console.log('Featured Image:', data.featuredImage);
+      console.log('User data:', userData);
+
+      if (post) {
+        // UPDATE MODE
+        console.log('UPDATE MODE');
+        let file = null;
+
+        if (data.featuredImage && data.featuredImage[0]) {
+          console.log('Uploading new image...');
+          file = await appwriteService.uploadFile(data.featuredImage[0]);
+          if (file && post.featuredImage) {
+            await appwriteService.deleteFile(post.featuredImage);
+          }
+        }
+
+        const updatedPost = await appwriteService.updatePost(post.$id, {
+          ...data,
+          featuredImage: file ? file.$id : post.featuredImage,
+        });
+
+        if (updatedPost) {
+          dispatch(updatePost(updatedPost));
+          navigate(`/post/${updatedPost.$id}`);
+        }
+      } else {
+        // CREATE MODE
+        console.log('CREATE MODE');
+
+        if (!data.featuredImage || !data.featuredImage[0]) {
+          dispatch(setError('Please select a featured image for your post'));
+          return;
+        }
+
+        console.log('File to upload:', data.featuredImage[0]);
+        console.log('Uploading file...');
+
+        const file = await appwriteService.uploadFile(data.featuredImage[0]);
+        console.log('Upload result:', file);
+
+        if (file) {
+          const fileId = file.$id;
+          console.log('Creating post with:', {
+            title: data.title,
+            slug: data.slug,
+            content: data.content,
+            featuredImage: fileId,
+            status: data.status,
+            userId: userData.$id,
+          });
+
+          const newPost = await appwriteService.createPost({
+            ...data,
+            featuredImage: fileId,
+            userId: userData.$id,
+          });
+
+          console.log('Post creation result:', newPost);
+
+          if (newPost) {
+            dispatch(addPost(newPost));
+            navigate(`/post/${newPost.$id}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error in form submission:', error);
+      dispatch(setError(error.message || 'Failed to submit post'));
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
@@ -132,47 +124,42 @@ function PostForm({ post }) {
         <Input
           label="Title :"
           placeholder="Title"
-          className="mb-4"
+          className="mb-4 cursor-text"
           {...register('title', { required: true })}
         />
         <Input
           label="Slug :"
           placeholder="Slug"
-          className="mb-4"
+          className="mb-4 cursor-text"
           {...register('slug', { required: true })}
           onInput={(e) => {
             setValue('slug', slugTransform(e.currentTarget.value), { shouldValidate: true });
           }}
         />
-        <RTE
-          label="Content :"
-          name="content"
-          control={control}
-          defaultValue={getValues('content')}
-        />
+        <RTE label="Content :" name="content" control={control} defaultValue={getValues('content')} />
       </div>
       <div className="w-1/3 px-2">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Featured Image :</label>
-        <Controller
-          name="featuredImage"
-          control={control}
-          rules={{ required: !post }}
-          render={({ field: { onChange, value, ...field } }) => (
-            <input
-              {...field}
-              type="file"
-              accept="image/png, image/jpg, image/jpeg, image/gif"
-              className="mb-4 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) => {
-                onChange(e.target.files);
-              }}
-            />
-          )}
-        />
+        <div className="mb-4">
+          <label htmlFor="featuredImage" className="inline-block mb-1 pl-1 cursor-pointer">
+            Featured Image :
+          </label>
+          <Controller
+            name="featuredImage"
+            control={control}
+            render={({ field }) => (
+              <input
+                type="file"
+                accept="image/png, image/jpg, image/jpeg, image/gif"
+                className="w-full px-3 py-2 rounded-lg bg-white text-black outline-none focus:bg-gray-50 duration-200 border border-gray-200 cursor-pointer"
+                onChange={(e) => field.onChange(e.target.files)}
+              />
+            )}
+          />
+        </div>
         {post && (
           <div className="w-full mb-4">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={appwriteService.getFileView(post.featuredImage)}
               alt={post.title}
               className="rounded-lg"
             />
@@ -181,15 +168,13 @@ function PostForm({ post }) {
         <Select
           options={['active', 'inactive']}
           label="Status"
-          className="mb-4"
+          className="mb-4 cursor-pointer"
           {...register('status', { required: true })}
         />
-        <Button type="submit" bgColor={post ? 'bg-green-500' : undefined} className="w-full">
+        <Button type="submit" bgColor={post ? 'bg-green-500' : undefined} className="w-full cursor-pointer">
           {post ? 'Update' : 'Submit'}
         </Button>
       </div>
     </form>
   );
 }
-
-export default PostForm;
