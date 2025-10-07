@@ -50,11 +50,13 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', sans-serif;
   line-height: 1.6;
+  cursor: default;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  cursor: pointer;
 }
 
 ::-webkit-scrollbar-track {
@@ -64,10 +66,12 @@ body {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
   border-radius: 4px;
+  cursor: pointer;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(to bottom, #2563eb, #7c3aed);
+  cursor: pointer;
 }
 
 /* Focus states */
@@ -79,14 +83,61 @@ body {
 /* Button hover animations */
 button {
   transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 /* Link hover effects */
 a {
   transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+/* Input fields */
+input,
+textarea,
+select {
+  cursor: text;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  cursor: text;
 }
 
 /* Card hover shadow effects */
 .shadow-lg:hover {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Interactive elements */
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.cursor-text {
+  cursor: text !important;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
+/* Hover effects for interactive content */
+[role='button'],
+.btn,
+.button,
+[type='submit'],
+[type='button'],
+[type='reset'] {
+  cursor: pointer;
+}
+
+/* Form labels */
+label {
+  cursor: pointer;
 }

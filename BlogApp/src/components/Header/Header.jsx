@@ -37,7 +37,10 @@ function Header() {
       <Container>
         <nav className="flex items-center justify-between py-4">
           <div className="flex items-center">
-            <Link to="/" className="hover:opacity-80 transition-opacity duration-200">
+            <Link
+              to="/"
+              className="hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+            >
               <Logo width="120px" />
             </Link>
           </div>
@@ -48,7 +51,7 @@ function Header() {
                 <li key={item.name}>
                   <button
                     onClick={() => navigate(item.slug)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer hover:scale-105 transform"
                   >
                     {item.name}
                   </button>

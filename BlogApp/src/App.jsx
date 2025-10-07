@@ -12,22 +12,27 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    authService
-      .getCurrentUser()
-      .then((user) => {
+    const checkAuth = async () => {
+      try {
+        console.log('Checking authentication...');
+        const user = await authService.getCurrentUser();
         if (user) {
+          console.log('User authenticated:', user.email);
           dispatch(login({ user }));
         } else {
+          console.log('No authenticated user found');
           dispatch(logout());
         }
-      })
-      .catch((err) => {
-        console.log('App.jsx :: useEffect :: err', err);
-        // Still dispatch logout for failed auth
+      } catch (error) {
+        console.log('App.jsx :: useEffect :: error', error);
         dispatch(logout());
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [dispatch]);
 
   return !loading ? (
     <div className="min-h-screen flex flex-col bg-gray-50">

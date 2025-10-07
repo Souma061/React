@@ -55,7 +55,7 @@ function Home() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <a
                       href="/add-post"
-                      className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md"
+                      className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md cursor-pointer"
                     >
                       <svg
                         className="w-5 h-5 mr-2"
@@ -74,7 +74,7 @@ function Home() {
                     </a>
                     <a
                       href="/all-posts"
-                      className="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                      className="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 cursor-pointer hover:scale-105 transform"
                     >
                       <svg
                         className="w-5 h-5 mr-2"
@@ -126,11 +126,23 @@ function Home() {
           {/* Call to Action */}
           <div className="text-center mt-16">
             <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto border border-gray-100">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Have something to share?</h3>
-              <p className="text-gray-600 mb-6">Join our community and share your unique perspective with the world.</p>
-              <a href="/add-post" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                Have something to share?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Join our community and share your unique perspective with the world.
+              </p>
+              <a
+                href="/add-post"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md cursor-pointer"
+              >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 4v16m8-8H4"
+                  ></path>
                 </svg>
                 Write a New Post
               </a>

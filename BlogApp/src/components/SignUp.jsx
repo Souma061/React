@@ -42,15 +42,18 @@ function SignUp() {
   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-6 py-12">
-      <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/10 backdrop-blur-2xl shadow-2xl">
+      <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-white/10 backdrop-blur-2xl shadow-2xl hover:shadow-3xl transition-all duration-300">
         <div className="border-b border-white/10 bg-white/5 px-10 py-6 text-center">
-          <span className="mx-auto mb-4 inline-block w-24">
+          <span className="mx-auto mb-4 inline-block w-24 cursor-pointer hover:scale-105 transition-transform duration-200">
             <Logo width="100%" />
           </span>
           <h2 className="text-3xl font-semibold text-white">Create your account</h2>
           <p className="mt-3 text-sm text-white/70">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-teal-300 hover:text-teal-200">
+            <Link
+              to="/login"
+              className="font-medium text-teal-300 hover:text-teal-200 cursor-pointer underline-offset-2 hover:underline transition-colors duration-200"
+            >
               Sign in
             </Link>
           </p>
@@ -68,14 +71,14 @@ function SignUp() {
               label="Full name"
               type="text"
               placeholder="Jane Doe"
-              className="bg-white/80"
+              className="bg-white/80 cursor-text focus:cursor-text hover:bg-white/90 transition-colors duration-200"
               {...register('name', { required: 'Name is required' })}
             />
             <Input
               label="Email"
               type="email"
               placeholder="you@example.com"
-              className="bg-white/80"
+              className="bg-white/80 cursor-text focus:cursor-text hover:bg-white/90 transition-colors duration-200"
               {...register('email', {
                 required: 'Email is required',
                 validate: {
@@ -89,7 +92,7 @@ function SignUp() {
               label="Password"
               type="password"
               placeholder="Minimum 6 characters"
-              className="bg-white/80"
+              className="bg-white/80 cursor-text focus:cursor-text hover:bg-white/90 transition-colors duration-200"
               {...register('password', {
                 required: 'Password is required',
                 validate: {
@@ -101,7 +104,7 @@ function SignUp() {
             <div className="pt-4">
               <Button
                 type="submit"
-                className="w-full rounded-xl bg-teal-500 px-6 py-3 text-lg font-semibold text-white shadow-lg shadow-teal-500/30 transition hover:bg-teal-400 hover:shadow-teal-400/40"
+                className="w-full rounded-xl bg-teal-500 px-6 py-3 text-lg font-semibold text-white shadow-lg shadow-teal-500/30 transition hover:bg-teal-400 hover:shadow-teal-400/40 cursor-pointer hover:scale-105 transform duration-200"
               >
                 Create Account
               </Button>
