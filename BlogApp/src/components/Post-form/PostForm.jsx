@@ -1,8 +1,9 @@
 import { useCallback, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import appwriteService from '../../Appwrite/configurations.js';
+import { Button, Input, RTE, Select } from '../index.js';
 
 function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
@@ -15,38 +16,94 @@ function PostForm({ post }) {
   });
 
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.user.userData);
+  const userData = useSelector((state) => state.auth.user);
   const submit = async (data) => {
-    if (post) {
-      const file = data.featuredImage[0]
-        ? await appwriteService.uploadFile(data.featuredImage[0])
-        : null;
-      if (file) {
-        await appwriteService.deleteFile(post.featuredImage);
-      }
-      const updatePost = await appwriteService.updatePost(post.$id, {
-        ...data,
-        featuredImage: file ? file.$id : undefined,
-      });
-      if (updatePost) {
-        navigate(`/posts/${updatePost.$id}`);
-      }
-    } else {
-      const file = data.featuredImage[0]
-        ? await appwriteService.uploadFile(data.featuredImage[0])
-        : null;
-      if (file) {
-        const fileID = file.$id;
-        data.featuredImage = fileID;
-        const newPost = await appwriteService.createPost({
-          ...data,
-          userID: userData.$id,
-        });
+    console.log('=== FORM SUBMISSION STARTED ===');
+    console.log('Form data:', data);
+    console.log('Featured Image:', data.featuredImage);
+    console.log('User data:', userData);
+
+    try {
+      if (post) {
+        console.log('UPDATE MODE');
+
+        // Check if new file is uploaded
+        let newFileId = null;
+        if (data.featuredImage && data.featuredImage.length > 0) {
+          console.log('Uploading new file for update...');
+          const uploadedFile = await appwriteService.uploadFile(data.featuredImage[0]);
+          if (uploadedFile) {
+            newFileId = uploadedFile.$id;
+            // Delete old file
+            await appwriteService.deleteFile(post.featuredImage);
+          }
+        }
+
+        // Update post
+        const updateData = {
+          title: data.title,
+          slug: data.slug,
+          content: data.content,
+          featuredImage: newFileId || post.featuredImage, // Keep old image if no new one
+          status: data.status,
+          userId: userData.$id,
+        };
+
+        console.log('Updating post with:', updateData);
+        const updatedPost = await appwriteService.updatePost(post.$id, updateData);
+        console.log('Update result:', updatedPost);
+
+        if (updatedPost) {
+          navigate(`/post/${updatedPost.$id}`);
+        } else {
+          alert('Post update failed');
+        }
+      } else {
+        console.log('CREATE MODE');
+
+        // Validate file
+        if (!data.featuredImage || data.featuredImage.length === 0) {
+          console.log('ERROR: No file selected');
+          alert('Please select a featured image');
+          return;
+        }
+
+        const fileToUpload = data.featuredImage[0];
+        console.log('File to upload:', fileToUpload);
+
+        // Upload file
+        console.log('Uploading file...');
+        const uploadedFile = await appwriteService.uploadFile(fileToUpload);
+        console.log('Upload result:', uploadedFile);
+
+        if (!uploadedFile) {
+          alert('File upload failed');
+          return;
+        }
+
+        // Create post
+        const postData = {
+          title: data.title,
+          slug: data.slug,
+          content: data.content,
+          featuredImage: uploadedFile.$id,
+          status: data.status,
+          userId: userData.$id, // Changed from userID to userId
+        };
+
+        console.log('Creating post with:', postData);
+        const newPost = await appwriteService.createPost(postData);
+        console.log('Post creation result:', newPost);
 
         if (newPost) {
-          navigate(`/posts/${newPost.$id}`);
+          navigate(`/post/${newPost.$id}`);
+        } else {
+          alert('Post creation failed');
         }
       }
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Error: ' + error.message);
     }
   };
   const slugTransform = useCallback((value) => {
@@ -95,12 +152,22 @@ function PostForm({ post }) {
         />
       </div>
       <div className="w-1/3 px-2">
-        <Input
-          label="Featured Image :"
-          type="file"
-          className="mb-4"
-          accept="image/png, image/jpg, image/jpeg, image/gif"
-          {...register('featuredImage', { required: !post })}
+        <label className="block text-gray-700 text-sm font-bold mb-2">Featured Image :</label>
+        <Controller
+          name="featuredImage"
+          control={control}
+          rules={{ required: !post }}
+          render={({ field: { onChange, value, ...field } }) => (
+            <input
+              {...field}
+              type="file"
+              accept="image/png, image/jpg, image/jpeg, image/gif"
+              className="mb-4 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => {
+                onChange(e.target.files);
+              }}
+            />
+          )}
         />
         {post && (
           <div className="w-full mb-4">

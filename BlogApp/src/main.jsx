@@ -3,10 +3,14 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
-import { Login, Protected, Signup } from './components/index.js';
+// import { Login, Protected, Signup } from './components/index.js';
+import Login from './Pages/Login.jsx';
+import Signup from './Pages/Signup.jsx';
+import Protected from './components/AuthLayout.jsx';
+
 import './index.css';
 import AddPost from './Pages/AddPost.jsx';
-import AllPosts from './Pages/AllPosts.jsx';
+import AllPosts from './Pages/AllPost.jsx';
 import EditPost from './Pages/EditPost.jsx';
 import Home from './Pages/Home.jsx';
 import Post from './Pages/Post.jsx';
