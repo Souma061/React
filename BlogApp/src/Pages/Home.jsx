@@ -21,17 +21,26 @@ function Home() {
     const fetchposts = async () => {
       dispatch(setLoading(true));
       try {
-        const respose = await appwriteService.listPosts();
-        if (respose) {
+        const response = await appwriteService.listPosts();
+        if (response && Array.isArray(response.documents)) {
           dispatch(
             setPosts({
-              posts: respose.documents,
-              totalPosts: respose.total || 0,
+              posts: response.documents,
+              totalPosts: response.total || response.documents.length || 0,
+            }),
+          );
+        } else {
+          dispatch(
+            setPosts({
+              posts: [],
+              totalPosts: 0,
             }),
           );
         }
       } catch (error) {
-        dispatch(setError(error.message || 'Failed to fetch posts'));
+        dispatch(setError(error?.message || 'Failed to fetch posts'));
+      } finally {
+        dispatch(setLoading(false));
       }
     };
     fetchposts();

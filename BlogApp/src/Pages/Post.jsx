@@ -113,12 +113,12 @@ export default function Post() {
   return post ? (
     <div className="py-8">
       <Container>
-        <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
+        <div className="relative mx-auto mb-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200/70 bg-white/60 shadow-xl shadow-slate-200/40 backdrop-blur-sm">
           {post.featuredImage ? (
             <img
               src={appwriteService.getFileView(post.featuredImage)}
               alt={post.title}
-              className="rounded-xl max-w-full h-auto"
+              className="h-80 w-full object-cover transition-transform duration-500 ease-out hover:scale-[1.02] md:h-[26rem]"
               onError={(e) => {
                 console.error('Image failed to load:', e);
                 console.log('File View URL:', appwriteService.getFileView(post.featuredImage));
@@ -137,11 +137,9 @@ export default function Post() {
           )}
 
           {isAuthor && (
-            <div className="absolute right-6 top-6">
+            <div className="absolute right-6 top-6 flex gap-3">
               <Link to={`/edit-post/${post.$id}`}>
-                <Button bgColor="bg-green-500" className="mr-3">
-                  Edit
-                </Button>
+                <Button bgColor="bg-green-500">Edit</Button>
               </Link>
               <Button bgColor="bg-red-500" onClick={deletePost}>
                 Delete
@@ -149,10 +147,12 @@ export default function Post() {
             </div>
           )}
         </div>
-        <div className="w-full mb-6">
-          <h1 className="text-2xl font-bold">{post.title}</h1>
+        <div className="mx-auto mb-6 w-full max-w-4xl px-2 text-center md:px-6">
+          <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">{post.title}</h1>
         </div>
-        <div className="browser-css">{parse(post.content)}</div>
+        <div className="browser-css mx-auto max-w-4xl rounded-3xl bg-white/70 p-6 shadow-lg shadow-slate-200/40 backdrop-blur-sm">
+          {parse(post.content)}
+        </div>
       </Container>
     </div>
   ) : null;

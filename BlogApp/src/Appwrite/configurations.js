@@ -77,6 +77,7 @@ export class Service {
       );
     } catch (error) {
       console.log('Appwrite service :: listPosts :: error', error);
+      throw error;
     }
   }
 

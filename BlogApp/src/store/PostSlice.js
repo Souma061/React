@@ -19,6 +19,7 @@ const postSlice = createSlice({
     // set error state
     setError: (state, action) => {
       state.error = action.payload;
+      state.loading = false;
     },
     //clear error state
     clearError: (state) => {

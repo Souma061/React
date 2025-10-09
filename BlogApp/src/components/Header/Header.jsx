@@ -33,39 +33,41 @@ function Header() {
     },
   ];
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-      <Container>
-        <nav className="flex items-center justify-between py-4">
-          <div className="flex items-center">
+    <header className="sticky top-0 z-40 bg-transparent">
+      <div className="relative">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-transparent to-purple-400/20 blur-3xl h-[140px]" />
+        <Container>
+          <nav className="relative flex items-center justify-between gap-6 rounded-2xl border border-slate-200/70 bg-white/85 px-6 py-3 shadow-lg shadow-sky-100/40 backdrop-blur-xl">
             <Link
               to="/"
-              className="hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+              className="flex items-center gap-3 transition-transform duration-200 hover:-translate-y-0.5"
             >
-              <Logo width="120px" />
+              <Logo width="56px" />
             </Link>
-          </div>
 
-          <ul className="flex items-center space-x-1">
-            {navItems.map((item) =>
-              item.active ? (
-                <li key={item.name}>
-                  <button
-                    onClick={() => navigate(item.slug)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer hover:scale-105 transform"
-                  >
-                    {item.name}
-                  </button>
+            <ul className="flex items-center gap-1.5 text-sm">
+              {navItems.map((item) =>
+                item.active ? (
+                  <li key={item.name}>
+                    <button
+                      onClick={() => navigate(item.slug)}
+                      className="group relative overflow-hidden rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition-all duration-200 hover:text-slate-900"
+                    >
+                      <span className="absolute inset-0 -z-10 scale-95 rounded-xl bg-gradient-to-r from-sky-100 via-indigo-100 to-purple-100 opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100" />
+                      {item.name}
+                    </button>
+                  </li>
+                ) : null,
+              )}
+              {authStatus && (
+                <li key="logout" className="pl-1">
+                  <LogoutBtn />
                 </li>
-              ) : null,
-            )}
-            {authStatus && (
-              <li key="logout" className="ml-2">
-                <LogoutBtn />
-              </li>
-            )}
-          </ul>
-        </nav>
-      </Container>
+              )}
+            </ul>
+          </nav>
+        </Container>
+      </div>
     </header>
   );
 }

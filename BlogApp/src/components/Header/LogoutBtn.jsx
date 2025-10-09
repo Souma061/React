@@ -9,6 +9,7 @@ function LogoutBtn() {
       .logOut()
       .then(() => {
         dispatch(logout());
+        window.location.reload()
       })
       .catch((err) => {
         console.log('LogoutBtn.jsx :: logoutHandler :: err', err);
