@@ -30,11 +30,11 @@ function AllPost() {
   }, [dispatch]);
   if (loading) {
     return (
-      <div className="py-8">
+      <div className="bg-white py-8 transition-colors duration-200 dark:bg-slate-950">
         <Container>
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading posts...</p>
+          <div className="text-center text-gray-700 dark:text-slate-200">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600 dark:border-blue-400"></div>
+            <p className="text-gray-600 dark:text-slate-400">Loading posts...</p>
           </div>
         </Container>
       </div>
@@ -42,13 +42,13 @@ function AllPost() {
   }
   if (error) {
     return (
-      <div className="py-8">
+      <div className="bg-white py-8 transition-colors duration-200 dark:bg-slate-950">
         <Container>
-          <div className="text-center">
-            <p className="text-red-600 mb-4">Error: {error}</p>
+          <div className="text-center text-gray-700 dark:text-slate-200">
+            <p className="mb-4 text-red-600 dark:text-red-400">Error: {error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
             >
               Retry
             </button>
@@ -58,9 +58,9 @@ function AllPost() {
     );
   }
   return (
-    <div className="w-full py-10">
+    <div className="w-full bg-white py-10 transition-colors duration-200 dark:bg-slate-950">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
           {posts.map((post) => (
             <div key={post.$id} className="col-span-1">
               <PostCard {...post} />

@@ -4,7 +4,7 @@ import Logo from '../Logo';
 function Footer() {
   return (
     <footer className="bg-gray-900 text-white relative overflow-hidden">
-      {/* Enhanced Background Pattern */}
+     
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900"></div>
       <div
         className="absolute inset-0 opacity-30"

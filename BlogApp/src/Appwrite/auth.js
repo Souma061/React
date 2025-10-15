@@ -7,38 +7,30 @@ export class AuthService {
 
   constructor() {
     this.client
-      .setEndpoint(conf.appwriteUrl) // Your API Endpoint
-      .setProject(conf.appwriteProjectId); // Your project ID
+      .setEndpoint(conf.appwriteUrl)
+      .setProject(conf.appwriteProjectId);
     this.account = new Account(this.client);
   }
 
   async createAccount({ email, password, name }) {
-    try {
-      const userAccount = await this.account.create(ID.unique(), email, password, name);
-      if (userAccount) {
-        // another method
-        return this.login({ email, password });
-      } else {
-        return userAccount;
-      }
-    } catch (error) {
-      throw error;
+    const userAccount = await this.account.create(ID.unique(), email, password, name);
+    if (userAccount) {
+      // another method
+      return this.login({ email, password });
+    } else {
+      return userAccount;
     }
   }
 
   async login({ email, password }) {
-    try {
-      return await this.account.createEmailPasswordSession(email, password);
-    } catch (error) {
-      throw error;
-    }
+    return this.account.createEmailPasswordSession(email, password);
   }
 
   async getCurrentUser() {
     try {
       return await this.account.get();
     } catch (error) {
-      // Handle 401 Unauthorized gracefully for guest users
+     
       if (error.code === 401 || error.type === 'general_unauthorized_scope') {
         console.log('User not authenticated - guest access');
         return null;

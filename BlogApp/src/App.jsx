@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import './App.css';
 import authService from './Appwrite/auth';
 import { Footer, Header } from './components/index.js';
@@ -10,6 +10,7 @@ import { login, logout } from './store/authSlice';
 function App() {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+  const themeMode = useSelector((state) => state.theme.mode);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -34,26 +35,37 @@ function App() {
     checkAuth();
   }, [dispatch]);
 
-  return !loading ? (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <Header />
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    if (themeMode === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('theme', themeMode);
+    }
+  }, [themeMode]);
 
-      {/* Main Content */}
-      <main className="flex-1">
-        <Outlet />
-      </main>
+  if (!loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-      {/* Footer */}
-      <Footer />
-    </div>
-  ) : (
-    // Loading State
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 text-slate-700 transition-colors duration-300 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:text-slate-100">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <h2 className="text-xl font-semibold text-gray-700 mb-2">Loading...</h2>
-        <p className="text-gray-500">Preparing your blog experience</p>
+        <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-blue-500 border-t-transparent dark:border-blue-400"></div>
+        <h2 className="mb-2 text-xl font-semibold">Loading...</h2>
+        <p className="text-slate-500 dark:text-slate-400">Preparing your blog experience</p>
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import appwriteService from '../../Appwrite/configurations';
+import { addPost, clearError, setError, updatePost } from '../../store/PostSlice';
 import { Button, Input, RTE, Select } from '../index';
-import { addPost, updatePost, setError } from '../../store/PostSlice';
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
@@ -19,6 +19,7 @@ export default function PostForm({ post }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.user);
+  const postError = useSelector((state) => state.post.error);
 
   // const watchedTitle = watch('title', '');
 
@@ -45,6 +46,7 @@ export default function PostForm({ post }) {
 
   const submit = async (data) => {
     try {
+      dispatch(clearError());
       console.log('=== FORM SUBMISSION STARTED ===');
       console.log('Form data:', data);
       console.log('Featured Image:', data.featuredImage);
@@ -98,17 +100,30 @@ export default function PostForm({ post }) {
             userId: userData.$id,
           });
 
-          const newPost = await appwriteService.createPost({
-            ...data,
-            featuredImage: fileId,
-            userId: userData.$id,
-          });
+          try {
+            const newPost = await appwriteService.createPost({
+              ...data,
+              featuredImage: fileId,
+              userId: userData.$id,
+            });
 
-          console.log('Post creation result:', newPost);
+            console.log('Post creation result:', newPost);
 
-          if (newPost) {
-            dispatch(addPost(newPost));
-            navigate(`/post/${newPost.$id}`);
+            if (newPost) {
+              dispatch(addPost(newPost));
+              navigate(`/post/${newPost.$id}`);
+            }
+          } catch (creationError) {
+            console.error('Error creating post:', creationError);
+            if (creationError?.code === 409) {
+              dispatch(
+                setError(
+                  'A post with this slug already exists. Change the title or slug and try again.',
+                ),
+              );
+            } else {
+              throw creationError;
+            }
           }
         }
       }
@@ -119,8 +134,16 @@ export default function PostForm({ post }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-      <div className="w-2/3 px-2">
+    <form
+      onSubmit={handleSubmit(submit)}
+      className="flex flex-wrap text-slate-800 transition-colors duration-200 dark:text-slate-100"
+    >
+      <div className="w-full px-2 lg:w-2/3">
+        {postError && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-200">
+            {postError}
+          </div>
+        )}
         <Input
           label="Title :"
           placeholder="Title"
@@ -132,15 +155,27 @@ export default function PostForm({ post }) {
           placeholder="Slug"
           className="mb-4 cursor-text"
           {...register('slug', { required: true })}
-          onInput={(e) => {
-            setValue('slug', slugTransform(e.currentTarget.value), { shouldValidate: true });
-          }}
+          disabled={Boolean(post)}
+          readOnly={Boolean(post)}
         />
-        <RTE label="Content :" name="content" control={control} defaultValue={getValues('content')} />
+        {post && (
+          <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
+            Slug is generated when the post is created and can’t be changed later.
+          </p>
+        )}
+        <RTE
+          label="Content :"
+          name="content"
+          control={control}
+          defaultValue={getValues('content')}
+        />
       </div>
-      <div className="w-1/3 px-2">
+      <div className="w-full px-2 pt-6 lg:w-1/3 lg:pt-0">
         <div className="mb-4">
-          <label htmlFor="featuredImage" className="inline-block mb-1 pl-1 cursor-pointer">
+          <label
+            htmlFor="featuredImage"
+            className="mb-1 inline-block cursor-pointer pl-1 text-slate-700 dark:text-slate-200"
+          >
             Featured Image :
           </label>
           <Controller
@@ -150,7 +185,7 @@ export default function PostForm({ post }) {
               <input
                 type="file"
                 accept="image/png, image/jpg, image/jpeg, image/gif"
-                className="w-full px-3 py-2 rounded-lg bg-white text-black outline-none focus:bg-gray-50 duration-200 border border-gray-200 cursor-pointer"
+                className="w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-black outline-none duration-200 focus:bg-gray-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 onChange={(e) => field.onChange(e.target.files)}
               />
             )}
@@ -161,7 +196,7 @@ export default function PostForm({ post }) {
             <img
               src={appwriteService.getFileView(post.featuredImage)}
               alt={post.title}
-              className="rounded-lg"
+              className="rounded-lg border border-slate-200/60 dark:border-slate-700/60"
             />
           </div>
         )}
@@ -171,7 +206,11 @@ export default function PostForm({ post }) {
           className="mb-4 cursor-pointer"
           {...register('status', { required: true })}
         />
-        <Button type="submit" bgColor={post ? 'bg-green-500' : undefined} className="w-full cursor-pointer">
+        <Button
+          type="submit"
+          bgColor={post ? 'bg-green-500' : undefined}
+          className="w-full cursor-pointer"
+        >
           {post ? 'Update' : 'Submit'}
         </Button>
       </div>
